@@ -43,7 +43,7 @@
  */
 #define cvector_erase(vec, i)                                                                                          \
     do {                                                                                                               \
-        if ((vec)) {                                                                                                   \
+        if (vec) {                                                                                                   \
             const size_t cv_sz = cvector_size(vec);                                                                    \
             if ((i) < cv_sz) {                                                                                         \
                 cvector_set_size((vec), cv_sz - 1);                                                                    \
@@ -59,7 +59,7 @@
  */
 #define cvector_free(vec)                                                                                              \
     do {                                                                                                               \
-        if ((vec)) {                                                                                                   \
+        if (vec) {                                                                                                     \
             free(((size_t *) (vec)) - 2);                                                                              \
         }                                                                                                              \
     } while (0)                                                                                                        \
@@ -151,7 +151,7 @@
     do {                                                                                                               \
         const size_t cv_cap = cvector_capacity(vec);                                                                   \
         const size_t cv_sz = cvector_size(vec);                                                                        \
-        if (cv_cap <= cv_sz + 1) {                                                                      \
+        if (cv_cap <= cv_sz + 1) {                                                                                     \
             cvector_grow((vec), cv_cap + 1);                                                                           \
         }                                                                                                              \
         if (pos < cv_sz) {                                                                                             \
@@ -181,10 +181,11 @@
  */
 #define cvector_copy(from, to)                                                                                         \
     do {                                                                                                               \
-        if ((from)) {                                                                                                  \
-            cvector_grow(to, cvector_size(from));                                                                      \
-            cvector_set_size(to, cvector_size(from));                                                                  \
-            memcpy((to), (from), cvector_size(from) * sizeof(*(from)));                                                \
+        if (from) {                                                                                                    \
+            const size_t cv_size = cvector_size(from);                                                                 \
+            cvector_grow(to, cv_size);                                                                                 \
+            cvector_set_size(to, cv_size);                                                                             \
+            memcpy((to), (from), cv_size * sizeof(*(from)));                                                           \
         }                                                                                                              \
     } while (0)                                                                                                        \
 
@@ -196,7 +197,7 @@
  */
 #define cvector_set_capacity(vec, size)                                                                                \
     do {                                                                                                               \
-        if ((vec)) {                                                                                                   \
+        if (vec) {                                                                                                     \
             ((size_t *) (vec))[-1] = (size);                                                                           \
         }                                                                                                              \
     } while (0)                                                                                                        \
@@ -209,7 +210,7 @@
  */
 #define cvector_set_size(vec, size)                                                                                    \
     do {                                                                                                               \
-        if ((vec)) {                                                                                                   \
+        if (vec) {                                                                                                     \
             ((size_t *) (vec))[-2] = (size);                                                                           \
         }                                                                                                              \
     } while (0)                                                                                                        \
@@ -223,14 +224,14 @@
 #define cvector_grow(vec, count)                                                                                       \
     do {                                                                                                               \
         const size_t cv_sz = (count) * sizeof(*(vec)) + (2 * sizeof(size_t));                                          \
-        if ((vec)) {                                                                                                   \
+        if (vec) {                                                                                                     \
             size_t * cv_p1 = ((size_t *) (vec)) - 2;                                                                   \
             size_t * cv_p2 = realloc(cv_p1, (cv_sz));                                                                  \
             assert(cv_p2);                                                                                             \
             (vec) = (void *) (cv_p2 + 2);                                                                              \
             cvector_set_capacity((vec), (count));                                                                      \
         } else {                                                                                                       \
-            size_t * cv_p = malloc(cv_sz);                                                                              \
+            size_t * cv_p = malloc(cv_sz);                                                                             \
             assert(cv_p);                                                                                              \
             (vec) = (void *) (cv_p + 2);                                                                               \
             cvector_set_capacity((vec), (count));                                                                      \
